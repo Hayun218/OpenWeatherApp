@@ -12,20 +12,36 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   var window: UIWindow?
   
   
-  func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-    // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-    // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-    // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
+  func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
     
-    window = UIWindow(frame: UIScreen.main.bounds)
+
     
-    let viewController = ViewController() // 처음 보일 view controller
+
+    // 앱 시작시
+
     
-    window?.rootViewController = viewController // root 설정
     
-    window?.makeKeyAndVisible() // 화면에 보이도록 셋팅
-    window?.windowScene = windowScene
+    let network = WeatherNetwork(manager: NetworkManager())
+    let repository = WeatherRepository(network: network)
+    let weatherUseCase = CityWeatherUsecase(repository: repository)
+    let cityRepository = CityRepository()
+    let cityUsecase = CityListUseCase(repository: cityRepository)
+    let viewModel = MainViewModel(
+        weatherUseCase: weatherUseCase,
+        cityListUseCase: cityUsecase
+    )
+    let viewController = MainViewController(viewModel: viewModel)
+    
+    Task {
+      _ = await cityUsecase.initialize()
+      print("init succe")
+    }
+    
+    
+    window = UIWindow(windowScene: windowScene)
+    window?.rootViewController = viewController
+    window?.makeKeyAndVisible()
   }
   
   func sceneDidDisconnect(_ scene: UIScene) {
