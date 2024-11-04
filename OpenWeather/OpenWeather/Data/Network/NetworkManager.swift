@@ -9,6 +9,10 @@ import Alamofire
 import Foundation
 
 
+public protocol NetworkManagerProtocol {
+  func fetchData<T: Decodable>(url: String, method: HTTPMethod, parameters: Parameters?) async -> Result<T, NetworkError>  
+}
+
 public class NetworkManager {
   private let session: SessionProtocol
   
