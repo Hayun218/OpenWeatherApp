@@ -15,6 +15,7 @@ final class MainViewModel {
   
   private let weatherStateRelay = BehaviorRelay<LoadingState<CityWeather>>(value: .idle)
   private let errorMessageRelay = PublishRelay<String>()
+  private let backgroundRelay = BehaviorRelay<UIImage?>(value: nil)
   
   init(weatherUseCase: CityWeatherUsecaseProtocol, citySearchViewModel: CitySearchViewModel) {
     self.weatherUseCase = weatherUseCase
@@ -48,6 +49,7 @@ final class MainViewModel {
     let weatherState: Observable<LoadingState<CityWeather>>
     let errorMessage: Observable<String>
     let coordinates: Observable<Coordinate>
+    let background: Observable<UIImage?>
   }
   
   public func transform(input: Input) -> Output {
@@ -75,10 +77,36 @@ final class MainViewModel {
         return nil
       }
     
+    let background = weatherStateRelay
+      .do(onNext: { [weak self] state in
+        if case .loaded(let weather) = state {
+          let imageName: String
+          switch weather.todayForecast.weather.lowercased() {
+          case "clear": imageName = "sunny"
+          case "clouds": imageName = "clouds"
+          case "rain", "drizzle", "thunderstorm": imageName = "rain"
+          case "snow": imageName = "clouds"
+          default: imageName = "sunny"
+          }
+          self?.backgroundRelay.accept(UIImage(named: imageName))
+        }
+      })
+      .map { [weak self] state -> UIImage? in
+        switch state {
+        case .loaded:
+          return self?.backgroundRelay.value
+        case .loading:
+          return self?.backgroundRelay.value
+        case .idle, .error:
+          return nil
+        }
+      }
+    
     return Output(
       weatherState: weatherStateRelay.asObservable(),
       errorMessage: errorMessageRelay.asObservable(),
-      coordinates: coordinates.asObservable()
+      coordinates: coordinates.asObservable(),
+      background: background.asObservable()
     )
   }
   
@@ -185,7 +213,7 @@ extension MainViewModel {
     
     let todayForecast = TodayForecast(
       currentTemp: currentHourlyForecast.temp,
-      weather: todayDailyForecast.weather,
+      weather: currentHourlyForecast.weather,
       weatherIcon: todayDailyForecast.weatherIcon,
       minTemp: todayDailyForecast.minTemp,
       maxTemp: todayDailyForecast.maxTemp,

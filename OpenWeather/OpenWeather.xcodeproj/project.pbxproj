@@ -34,7 +34,6 @@
 		AEDD6CAB2CD8F4E40048034A /* WeatherHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEDD6CAA2CD8F4E40048034A /* WeatherHeader.swift */; };
 		AEDD6CAD2CD8F5150048034A /* HourlyForecaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEDD6CAC2CD8F5150048034A /* HourlyForecaseView.swift */; };
 		AEDD6CAF2CD8F5C60048034A /* DailyForecastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEDD6CAE2CD8F5C60048034A /* DailyForecastView.swift */; };
-		AEDD6CB12CD8F5EC0048034A /* WeatherMetricView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEDD6CB02CD8F5EC0048034A /* WeatherMetricView.swift */; };
 		AEDD6CB32CD8F6150048034A /* WeatherLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEDD6CB22CD8F6150048034A /* WeatherLabel.swift */; };
 		AEDD6CB52CD8F6440048034A /* MetricItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEDD6CB42CD8F6440048034A /* MetricItemView.swift */; };
 		AEDD6CBC2CD9001B0048034A /* WeatherReopsitory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEDD6CBB2CD9001B0048034A /* WeatherReopsitory.swift */; };
@@ -75,7 +74,6 @@
 		AEDD6CAA2CD8F4E40048034A /* WeatherHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherHeader.swift; sourceTree = "<group>"; };
 		AEDD6CAC2CD8F5150048034A /* HourlyForecaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyForecaseView.swift; sourceTree = "<group>"; };
 		AEDD6CAE2CD8F5C60048034A /* DailyForecastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyForecastView.swift; sourceTree = "<group>"; };
-		AEDD6CB02CD8F5EC0048034A /* WeatherMetricView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherMetricView.swift; sourceTree = "<group>"; };
 		AEDD6CB22CD8F6150048034A /* WeatherLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherLabel.swift; sourceTree = "<group>"; };
 		AEDD6CB42CD8F6440048034A /* MetricItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricItemView.swift; sourceTree = "<group>"; };
 		AEDD6CBB2CD9001B0048034A /* WeatherReopsitory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherReopsitory.swift; sourceTree = "<group>"; };
@@ -265,7 +263,6 @@
 				AEDD6CAA2CD8F4E40048034A /* WeatherHeader.swift */,
 				AEDD6CAC2CD8F5150048034A /* HourlyForecaseView.swift */,
 				AEDD6CAE2CD8F5C60048034A /* DailyForecastView.swift */,
-				AEDD6CB02CD8F5EC0048034A /* WeatherMetricView.swift */,
 				AEDD6CB22CD8F6150048034A /* WeatherLabel.swift */,
 				AEDD6CB42CD8F6440048034A /* MetricItemView.swift */,
 				AEDD6CC02CD9059F0048034A /* SearchButton.swift */,
@@ -434,7 +431,6 @@
 			files = (
 				AEADAC102CD4BDDC0073487E /* CitySearchViewController.swift in Sources */,
 				AE5CD86E2CD86FAC0050CEA7 /* CityWeatherRepositoryProtocol.swift in Sources */,
-				AEDD6CB12CD8F5EC0048034A /* WeatherMetricView.swift in Sources */,
 				AE5CD8762CD8C1CD0050CEA7 /* WeatherNetwork.swift in Sources */,
 				AEDD6CB32CD8F6150048034A /* WeatherLabel.swift in Sources */,
 				AEADAC0E2CD4BDD40073487E /* MainViewController.swift in Sources */,

@@ -16,7 +16,6 @@ final class MainViewController: UIViewController {
   private let weatherHeader = WeatherHeaderView()
   private let hourlyForecast = HourlyForecastView()
   private let dailyForecast = DailyForecastView()
-  private let metricsView = WeatherMetricsView()
   private let mapView: MKMapView = {
     let map = MKMapView()
     map.layer.cornerRadius = 15
@@ -24,6 +23,17 @@ final class MainViewController: UIViewController {
     return map
   }()
   private let loadingIndicator = UIActivityIndicatorView(style: .large)
+  private let backgroundImageView: UIImageView = {
+    let imageView = UIImageView()
+    imageView.contentMode = .scaleAspectFill
+    imageView.alpha = 0.7
+    return imageView
+  }()
+  
+  // Metrics Components
+  private let humidityView = MetricItemView()
+  private let cloudsView = MetricItemView()
+  private let windSpeedView = MetricItemView()
   
   // Rx Subject for refresh
   private let refreshTrigger = PublishSubject<Void>()
@@ -46,11 +56,12 @@ final class MainViewController: UIViewController {
     bindViewModel()
   }
   
-  
-  
   // MARK: - Setup
   private func setupUI() {
-    view.backgroundColor = UIColor(red: 0.2, green: 0.4, blue: 0.8, alpha: 1.0)
+    view.addSubview(backgroundImageView)
+    backgroundImageView.snp.makeConstraints { make in
+      make.edges.equalToSuperview()
+    }
     
     let scrollView = UIScrollView()
     let contentView = UIView()
@@ -60,8 +71,10 @@ final class MainViewController: UIViewController {
     scrollView.addSubview(contentView)
     view.addSubview(loadingIndicator)
     
-    [weatherHeader, hourlyForecast, dailyForecast, mapView, metricsView]
-      .forEach { contentView.addSubview($0) }
+    [weatherHeader, hourlyForecast, dailyForecast, mapView,
+     humidityView, cloudsView, windSpeedView].forEach {
+      contentView.addSubview($0)
+    }
     
     setupConstraints(scrollView: scrollView, contentView: contentView)
   }
@@ -100,25 +113,37 @@ final class MainViewController: UIViewController {
       make.height.equalTo(280)
     }
     
-    
     mapView.snp.makeConstraints { make in
       make.top.equalTo(dailyForecast.snp.bottom).offset(20)
       make.leading.trailing.equalToSuperview().inset(16)
-      make.height.equalTo(200)  // 맵 높이 설정
+      make.height.equalTo(200)
     }
     
-    metricsView.snp.makeConstraints { make in
-      make.top.equalTo(mapView.snp.bottom).offset(20)  // 수정
-      make.leading.trailing.equalToSuperview().inset(16)
-      make.height.equalTo(100)
+    let metricWidth = (view.frame.width - 42) / 2  // 2개의 아이템을 위한 너비 계산
+    
+    humidityView.snp.makeConstraints { make in
+      make.top.equalTo(mapView.snp.bottom).offset(20)
+      make.leading.equalToSuperview().inset(16)
+      make.width.equalTo(metricWidth)
+      make.height.equalTo(metricWidth-20)  // 높이를 너비와 동일하게 설정
+    }
+    
+    cloudsView.snp.makeConstraints { make in
+      make.top.equalTo(humidityView)
+      make.leading.equalTo(humidityView.snp.trailing).offset(20)
+      make.trailing.equalToSuperview().inset(16)
+      make.width.height.equalTo(humidityView)  // 너비와 높이를 humidityView와 동일하게
+    }
+    
+    windSpeedView.snp.makeConstraints { make in
+      make.top.equalTo(humidityView.snp.bottom).offset(20)
+      make.leading.equalToSuperview().inset(16)
+      make.width.height.equalTo(humidityView)  // 너비와 높이를 humidityView와 동일하게
       make.bottom.equalToSuperview().offset(-20)
     }
-    
-    
   }
   
   private func bindViewModel() {
-    // Input 설정
     let viewWillAppearObservable = rx.methodInvoked(#selector(UIViewController.viewWillAppear(_:)))
       .map { _ in () }
       .asObservable()
@@ -128,10 +153,8 @@ final class MainViewController: UIViewController {
       refreshTrigger: refreshTrigger.asObservable()
     )
     
-    // Output 바인딩
     let output = viewModel.transform(input: input)
     
-    // 날씨 상태 구독
     output.weatherState
       .observe(on: MainScheduler.instance)
       .subscribe(onNext: { [weak self] state in
@@ -139,7 +162,6 @@ final class MainViewController: UIViewController {
       })
       .disposed(by: disposeBag)
     
-    // 에러 메시지 구독
     output.errorMessage
       .observe(on: MainScheduler.instance)
       .subscribe(onNext: { [weak self] message in
@@ -147,13 +169,11 @@ final class MainViewController: UIViewController {
       })
       .disposed(by: disposeBag)
     
-    // Search Button 바인딩
     searchButton.rx.tap
       .subscribe(onNext: { [weak self] in
         self?.showCitySearch()
       })
       .disposed(by: disposeBag)
-    // 맵 바인딩
     
     output.coordinates
       .observe(on: MainScheduler.instance)
@@ -162,10 +182,23 @@ final class MainViewController: UIViewController {
       })
       .disposed(by: disposeBag)
     
+    output.background
+      .observe(on: MainScheduler.instance)
+      .subscribe(onNext: { [weak self] image in
+        UIView.animate(withDuration: 0.3) {
+          if let image = image {
+            self?.backgroundImageView.image = image
+            self?.backgroundImageView.backgroundColor = .clear
+          } else {
+            self?.backgroundImageView.image = nil
+            self?.backgroundImageView.backgroundColor = UIColor(red: 0.2, green: 0.4, blue: 0.8, alpha: 1.0)
+          }
+        }
+      })
+      .disposed(by: disposeBag)
   }
   
   private func updateMapLocation(_ coordinate: Coordinate) {
-    // 좌표로 지도 중심 이동
     let location = CLLocationCoordinate2D(
       latitude: coordinate.lat,
       longitude: coordinate.lon
@@ -176,16 +209,12 @@ final class MainViewController: UIViewController {
     )
     mapView.setRegion(region, animated: true)
     
-    // 기존 핀 제거
     mapView.removeAnnotations(mapView.annotations)
     
-    // 새로운 핀 추가
     let annotation = MKPointAnnotation()
     annotation.coordinate = location
     mapView.addAnnotation(annotation)
   }
-  
-  
   
   // MARK: - UI Updates
   private func handleWeatherState(_ state: LoadingState<CityWeather>) {
@@ -203,15 +232,22 @@ final class MainViewController: UIViewController {
   }
   
   private func updateUI(with weather: CityWeather) {
-    
-    print(weather.hourlyForecast)
     weatherHeader.configure(with: weather)
     hourlyForecast.configure(with: weather.hourlyForecast)
     dailyForecast.configure(with: weather.dailyForecast)
-    metricsView.configure(
-      humidity: weather.todayForecast.averageHumidity,
-      clouds: Int(Double(weather.todayForecast.averageClouds)),
-      windSpeed: weather.todayForecast.averageWindSpeed
+    
+    // Update metrics views
+    humidityView.configure(
+      title: "습도",
+      value: "\(Int(round(weather.todayForecast.averageHumidity)))%"
+    )
+    cloudsView.configure(
+      title: "구름",
+      value: "\(weather.todayForecast.averageClouds)%"
+    )
+    windSpeedView.configure(
+      title: "바람",
+      value: String(format: "%.1f m/s", weather.todayForecast.averageWindSpeed)
     )
   }
   
