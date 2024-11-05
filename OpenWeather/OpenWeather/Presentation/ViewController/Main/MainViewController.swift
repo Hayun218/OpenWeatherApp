@@ -1,11 +1,14 @@
-// MARK: - Presentation/View/MainViewController.swift
 import UIKit
+import MapKit
+import CoreLocation
 import RxSwift
+import RxCocoa
 import SnapKit
 
 final class MainViewController: UIViewController {
   // MARK: - Properties
   private let viewModel: MainViewModel
+  private let citySearchViewModel: CitySearchViewModel
   private let disposeBag = DisposeBag()
   
   // MARK: - UI Components
@@ -14,11 +17,21 @@ final class MainViewController: UIViewController {
   private let hourlyForecast = HourlyForecastView()
   private let dailyForecast = DailyForecastView()
   private let metricsView = WeatherMetricsView()
+  private let mapView: MKMapView = {
+    let map = MKMapView()
+    map.layer.cornerRadius = 15
+    map.clipsToBounds = true
+    return map
+  }()
   private let loadingIndicator = UIActivityIndicatorView(style: .large)
   
-  // MARK: - Initialization
-  init(viewModel: MainViewModel) {
+  // Rx Subject for refresh
+  private let refreshTrigger = PublishSubject<Void>()
+  
+  // MARK: - Init
+  init(viewModel: MainViewModel, citySearchViewModel: CitySearchViewModel) {
     self.viewModel = viewModel
+    self.citySearchViewModel = citySearchViewModel
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -30,9 +43,10 @@ final class MainViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     setupUI()
-    setupBindings()
-    setupActions()
+    bindViewModel()
   }
+  
+  
   
   // MARK: - Setup
   private func setupUI() {
@@ -46,14 +60,13 @@ final class MainViewController: UIViewController {
     scrollView.addSubview(contentView)
     view.addSubview(loadingIndicator)
     
-    [weatherHeader, hourlyForecast, dailyForecast, metricsView]
+    [weatherHeader, hourlyForecast, dailyForecast, mapView, metricsView]
       .forEach { contentView.addSubview($0) }
     
     setupConstraints(scrollView: scrollView, contentView: contentView)
   }
   
   private func setupConstraints(scrollView: UIScrollView, contentView: UIView) {
-    // 기존 제약 조건 유지
     searchButton.snp.makeConstraints { make in
       make.top.equalTo(view.safeAreaLayoutGuide).offset(16)
       make.leading.trailing.equalToSuperview().inset(16)
@@ -78,16 +91,24 @@ final class MainViewController: UIViewController {
     hourlyForecast.snp.makeConstraints { make in
       make.top.equalTo(weatherHeader.snp.bottom).offset(20)
       make.leading.trailing.equalToSuperview().inset(16)
-      make.height.equalTo(100)
+      make.height.equalTo(106)
     }
     
     dailyForecast.snp.makeConstraints { make in
       make.top.equalTo(hourlyForecast.snp.bottom).offset(20)
       make.leading.trailing.equalToSuperview().inset(16)
+      make.height.equalTo(280)
+    }
+    
+    
+    mapView.snp.makeConstraints { make in
+      make.top.equalTo(dailyForecast.snp.bottom).offset(20)
+      make.leading.trailing.equalToSuperview().inset(16)
+      make.height.equalTo(200)  // 맵 높이 설정
     }
     
     metricsView.snp.makeConstraints { make in
-      make.top.equalTo(dailyForecast.snp.bottom).offset(20)
+      make.top.equalTo(mapView.snp.bottom).offset(20)  // 수정
       make.leading.trailing.equalToSuperview().inset(16)
       make.height.equalTo(100)
       make.bottom.equalToSuperview().offset(-20)
@@ -98,25 +119,75 @@ final class MainViewController: UIViewController {
     }
   }
   
-  private func setupBindings() {
-    viewModel.weatherState
+  private func bindViewModel() {
+    // Input 설정
+    let viewWillAppearObservable = rx.methodInvoked(#selector(UIViewController.viewWillAppear(_:)))
+      .map { _ in () }
+      .asObservable()
+    
+    let input = MainViewModel.Input(
+      viewWillAppear: viewWillAppearObservable,
+      refreshTrigger: refreshTrigger.asObservable()
+    )
+    
+    // Output 바인딩
+    let output = viewModel.transform(input: input)
+    
+    // 날씨 상태 구독
+    output.weatherState
       .observe(on: MainScheduler.instance)
       .subscribe(onNext: { [weak self] state in
         self?.handleWeatherState(state)
       })
       .disposed(by: disposeBag)
     
-    viewModel.errorMessage
+    // 에러 메시지 구독
+    output.errorMessage
       .observe(on: MainScheduler.instance)
       .subscribe(onNext: { [weak self] message in
         self?.showError(message)
       })
       .disposed(by: disposeBag)
+    
+    // Search Button 바인딩
+    searchButton.rx.tap
+      .subscribe(onNext: { [weak self] in
+        self?.showCitySearch()
+      })
+      .disposed(by: disposeBag)
+    // 맵 바인딩
+    
+    output.coordinates
+      .observe(on: MainScheduler.instance)
+      .subscribe(onNext: { [weak self] coordinate in
+        self?.updateMapLocation(coordinate)
+      })
+      .disposed(by: disposeBag)
+    
   }
   
-  private func setupActions() {
-    searchButton.addTarget(self, action: #selector(searchButtonTapped), for: .touchUpInside)
+  private func updateMapLocation(_ coordinate: Coordinate) {
+    // 좌표로 지도 중심 이동
+    let location = CLLocationCoordinate2D(
+      latitude: coordinate.lat,
+      longitude: coordinate.lon
+    )
+    let region = MKCoordinateRegion(
+      center: location,
+      span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
+    )
+    mapView.setRegion(region, animated: true)
+    
+    // 기존 핀 제거
+    mapView.removeAnnotations(mapView.annotations)
+    
+    // 새로운 핀 추가
+    let annotation = MKPointAnnotation()
+    annotation.coordinate = location
+    mapView.addAnnotation(annotation)
   }
+  
+  
   
   // MARK: - UI Updates
   private func handleWeatherState(_ state: LoadingState<CityWeather>) {
@@ -134,13 +205,15 @@ final class MainViewController: UIViewController {
   }
   
   private func updateUI(with weather: CityWeather) {
+    
+    print(weather.hourlyForecast)
     weatherHeader.configure(with: weather)
     hourlyForecast.configure(with: weather.hourlyForecast)
     dailyForecast.configure(with: weather.dailyForecast)
     metricsView.configure(
-      humidity: weather.averageHumidity,
-      clouds: Int(Double(weather.averageClouds)),
-      windSpeed: weather.averageWindSpeed
+      humidity: weather.todayForecast.averageHumidity,
+      clouds: Int(Double(weather.todayForecast.averageClouds)),
+      windSpeed: weather.todayForecast.averageWindSpeed
     )
   }
   
@@ -150,20 +223,11 @@ final class MainViewController: UIViewController {
     present(alert, animated: true)
   }
   
-  // MARK: - Actions
-  @objc private func searchButtonTapped() {
-    let cityListVC = CityListSearchViewController(useCase: viewModel.getCityListUseCase())
-    cityListVC.delegate = self
-    cityListVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-    present(cityListVC, animated: true)
-  }
-}
-
-// MARK: - CitySelectionDelegate
-extension MainViewController: CitySelectionDelegate {
-  func didSelectCity(_ city: City) {
-    dismiss(animated: true) {
-      self.viewModel.fetchWeatherData(for: city)
-    }
+  // MARK: - Navigation
+  private func showCitySearch() {
+    let citySearchVC = CitySearchViewController(
+      viewModel: citySearchViewModel
+    )
+    present(citySearchVC, animated: true)
   }
 }

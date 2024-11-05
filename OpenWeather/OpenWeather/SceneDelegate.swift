@@ -13,35 +13,40 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   
   
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options: UIScene.ConnectionOptions) {
-    guard let windowScene = (scene as? UIWindowScene) else { return }
-    
-
-    
-
-    // 앱 시작시
-
-    
-    
-    let network = WeatherNetwork(manager: NetworkManager())
-    let repository = WeatherRepository(network: network)
-    let weatherUseCase = CityWeatherUsecase(repository: repository)
-    let cityRepository = CityRepository()
-    let cityUsecase = CityListUseCase(repository: cityRepository)
-    let viewModel = MainViewModel(
-        weatherUseCase: weatherUseCase,
-        cityListUseCase: cityUsecase
-    )
-    let viewController = MainViewController(viewModel: viewModel)
-    
-    Task {
-      _ = await cityUsecase.initialize()
-      print("init succe")
-    }
-    
-    
-    window = UIWindow(windowScene: windowScene)
-    window?.rootViewController = viewController
-    window?.makeKeyAndVisible()
+      guard let windowScene = (scene as? UIWindowScene) else { return }
+      
+      // Repository & UseCase 초기화
+      let network = WeatherNetwork(manager: NetworkManager())
+      let repository = WeatherRepository(network: network)
+      let weatherUseCase = CityWeatherUsecase(repository: repository)
+      let cityRepository = CityRepository()
+      let cityUsecase = CityListUseCase(repository: cityRepository)
+      
+      // City 초기화 및 ViewModel 생성
+      Task {
+          // City 데이터 초기화
+          let result = await cityUsecase.initialize()
+          
+          await MainActor.run {
+              // ViewModel 생성
+              let citySearchViewModel = CitySearchViewModel(cityListUseCase: cityUsecase)
+              let mainViewModel = MainViewModel(
+                  weatherUseCase: weatherUseCase,
+                  citySearchViewModel: citySearchViewModel
+              )
+              
+              // ViewController 생성 및 설정
+              let viewController = MainViewController(
+                  viewModel: mainViewModel,
+                  citySearchViewModel: citySearchViewModel
+              )
+              
+              // Window 설정
+              self.window = UIWindow(windowScene: windowScene)
+              self.window?.rootViewController = viewController
+              self.window?.makeKeyAndVisible()
+          }
+      }
   }
   
   func sceneDidDisconnect(_ scene: UIScene) {
