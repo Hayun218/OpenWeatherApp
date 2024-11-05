@@ -114,9 +114,7 @@ final class MainViewController: UIViewController {
       make.bottom.equalToSuperview().offset(-20)
     }
     
-    loadingIndicator.snp.makeConstraints { make in
-      make.center.equalToSuperview()
-    }
+    
   }
   
   private func bindViewModel() {

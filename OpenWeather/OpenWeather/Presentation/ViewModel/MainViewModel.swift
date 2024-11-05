@@ -298,23 +298,3 @@ private func findMostCommonIcon(in data: [WeatherData]) -> String {
   return iconCounts.max(by: { $0.value < $1.value })?.key ?? ""
 }
 
-
-// MARK: - Date Formatter
-extension ISO8601DateFormatter {
-  static let weatherDateFormatter: ISO8601DateFormatter = {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [.withYear, .withMonth, .withDay, .withTime, .withDashSeparatorInDate, .withColonSeparatorInTime]
-    return formatter
-  }()
-}
-
-// MARK: - Date Extension for Formatting
-extension Date {
-  
-  func dayString() -> String {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "E"  // 요일
-    formatter.locale = Locale(identifier: "ko_KR")
-    return formatter.string(from: self)
-  }
-}

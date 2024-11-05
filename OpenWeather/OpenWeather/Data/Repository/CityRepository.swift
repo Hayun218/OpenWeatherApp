@@ -32,8 +32,24 @@ public class CityRepository: CityRepositoryProtocol {
     guard !name.isEmpty else { return cities }
     
     let searchTerm = name.lowercased()
+    
     return cities.filter { $0.name.lowercased().contains(searchTerm) }
+      .sorted { city1, city2 in
+        let city1Name = city1.name.lowercased()
+        let city2Name = city2.name.lowercased()
+        
+        // Prioritize exact match
+        if city1Name == searchTerm {
+          return true
+        } else if city2Name == searchTerm {
+          return false
+        }
+        
+        // Prioritize prefix match
+        return city1Name.hasPrefix(searchTerm) && !city2Name.hasPrefix(searchTerm)
+      }
   }
+  
   
   public func saveCities(_ cities: [City]) throws {
     let encodedData = try JSONEncoder().encode(cities)
