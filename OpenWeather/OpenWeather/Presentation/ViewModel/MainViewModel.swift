@@ -1,4 +1,3 @@
-// MARK: - Presentation/ViewModel/MainViewModel.swift
 import Foundation
 import RxSwift
 import RxCocoa
@@ -21,23 +20,8 @@ final class MainViewModel {
     self.weatherUseCase = weatherUseCase
     self.citySearchViewModel = citySearchViewModel
     
-    // 초기 날씨 데이터 로드
+    // 초기 데이터 로딩
     fetchWeatherData(for: citySearchViewModel.currentSelectedCity)
-    
-    // 도시 선택 변경 구독
-    citySearchViewModel.transform(
-      input: .init(
-        viewWillAppear: .empty(),
-        searchText: .empty(),
-        citySelected: .empty()
-      )
-    )
-    .selectedCity
-    .distinctUntilChanged { $0.id == $1.id }
-    .bind(onNext: { [weak self] city in
-      self?.fetchWeatherData(for: city)
-    })
-    .disposed(by: disposeBag)
   }
   
   public struct Input {
@@ -53,17 +37,23 @@ final class MainViewModel {
   }
   
   public func transform(input: Input) -> Output {
-    // 화면 새로고침
+    
+    
     Observable.merge(
-      input.viewWillAppear,
-      input.refreshTrigger
-    )
-    .map { [weak self] _ -> City in
-      guard let self = self else {
-        return self?.citySearchViewModel.currentSelectedCity ?? City.default
+      citySearchViewModel.transform(
+        input: .init(
+          viewWillAppear: .empty(),
+          searchText: .empty(),
+          citySelected: .empty()
+        )
+      )
+      .selectedCity
+        .distinctUntilChanged { $0.id == $1.id },
+      
+      input.refreshTrigger.map { [weak self] _ in
+        self?.citySearchViewModel.currentSelectedCity ?? City.default
       }
-      return self.citySearchViewModel.currentSelectedCity
-    }
+    )
     .bind(onNext: { [weak self] city in
       self?.fetchWeatherData(for: city)
     })
@@ -71,7 +61,7 @@ final class MainViewModel {
     
     let coordinates = weatherStateRelay
       .compactMap { state -> Coordinate? in
-        if case .loaded(let weather) = state {
+        if case .loaded(_) = state {
           return self.citySearchViewModel.currentSelectedCity.coord
         }
         return nil
@@ -283,7 +273,6 @@ extension MainViewModel {
       
       let startOfDay = calendar.startOfDay(for: date)
       dailyData[startOfDay, default: []].append(data)
-      print("DEBUG: Added data for date: \(startOfDay)")
     }
     
     // 각 날짜별 예보 생성

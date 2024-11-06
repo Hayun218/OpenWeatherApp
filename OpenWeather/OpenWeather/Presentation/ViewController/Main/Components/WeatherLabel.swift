@@ -8,16 +8,15 @@
 import Foundation
 import UIKit
 
-// MARK: - Main/Components/WeatherLabel.swift
 final class WeatherLabel: UILabel {
-    init(size: CGFloat, weight: UIFont.Weight = .regular) {
-        super.init(frame: .zero)
-        textColor = .white
-        font = .systemFont(ofSize: size, weight: weight)
-        textAlignment = .center
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+  init(size: CGFloat, weight: UIFont.Weight = .regular) {
+    super.init(frame: .zero)
+    textColor = .white
+    font = .systemFont(ofSize: size, weight: weight)
+    textAlignment = .center
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 }

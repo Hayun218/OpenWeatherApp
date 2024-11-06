@@ -63,7 +63,7 @@ final class CitySearchViewController: UIViewController {
   }
   
   private func setupBackground() {
-    view.backgroundColor = UIColor(red: 0.2, green: 0.4, blue: 0.8, alpha: 1.0)
+    view.backgroundColor = UIColor(hexCode: "6A92C4")
   }
   
   private func setupSubviews() {

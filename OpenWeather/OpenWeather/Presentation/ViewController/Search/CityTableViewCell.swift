@@ -5,7 +5,6 @@
 //  Created by yun on 11/4/24.
 //
 
-// MARK: - Main/Components/CityTableViewCell.swift
 import UIKit
 import SnapKit
 
@@ -35,8 +34,6 @@ final class CityTableViewCell: UITableViewCell {
     fatalError("init(coder:) has not been implemented")
   }
   
-  
-  
   // MARK: - Setup
   private func setupUI() {
     backgroundColor = .clear
@@ -50,7 +47,6 @@ final class CityTableViewCell: UITableViewCell {
     stackView.translatesAutoresizingMaskIntoConstraints = false
     contentView.addSubview(stackView)
     
-    // Apply layoutMargins to stackView
     stackView.snp.makeConstraints { make in
       make.edges.equalTo(contentView.layoutMarginsGuide)
     }

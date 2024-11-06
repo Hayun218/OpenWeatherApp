@@ -19,14 +19,14 @@ final class HourlyForecastView: UIView {
   private let hourlyCollectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .horizontal
-    layout.minimumInteritemSpacing = 30  // 간격 넓게
-    layout.itemSize = CGSize(width: 70, height: 90)  // 셀 크기 줄임
+    layout.minimumInteritemSpacing = 30
+    layout.itemSize = CGSize(width: 60, height: 90)
     
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     collectionView.backgroundColor = .white.withAlphaComponent(0.2)
     collectionView.showsHorizontalScrollIndicator = false
     collectionView.register(HourlyForecastCell.self, forCellWithReuseIdentifier: "HourlyCell")
-    collectionView.contentInset = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)  // 좌우 여백 추가
+    collectionView.contentInset = UIEdgeInsets(top: 12, left: 6, bottom: 12, right: 6)
     collectionView.layer.cornerRadius = 15
     collectionView.clipsToBounds = true     
     return collectionView

@@ -54,7 +54,8 @@ final class DailyForecastCell: UITableViewCell {
     }
     
     weatherImageView.snp.makeConstraints { make in
-      make.center.equalToSuperview()
+      make.centerY.equalToSuperview()
+      make.centerX.equalToSuperview().offset(-30)
       make.width.height.equalTo(30)
     }
     
@@ -83,6 +84,6 @@ final class DailyForecastCell: UITableViewCell {
     let iconName = String(forecast.weatherIcon.dropLast()) + "d"
     
     weatherImageView.image = UIImage(named: iconName)
-    minMaxLabel.text = "최저: \(Int(round(forecast.minTemp)))° 최고: \(Int(round(forecast.maxTemp)))°"
+    minMaxLabel.text = "최소: \(Int(round(forecast.minTemp)))° 최고: \(Int(round(forecast.maxTemp)))°"
   }
 }

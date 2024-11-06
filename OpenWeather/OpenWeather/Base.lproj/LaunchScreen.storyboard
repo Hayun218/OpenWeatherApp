@@ -1,7 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.16" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.12"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -11,15 +13,55 @@
             <objects>
                 <viewController id="01J-lp-oVM" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" xcode11CocoaTouchSystemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="04d" translatesAutoresizingMaskIntoConstraints="NO" id="WTV-TQ-o3W">
+                                <rect key="frame" x="170.66666666666666" y="400" width="52" height="52"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="52" id="1JR-Xx-0Mf"/>
+                                    <constraint firstAttribute="height" constant="52" id="KGy-2W-jqW"/>
+                                    <constraint firstAttribute="width" secondItem="WTV-TQ-o3W" secondAttribute="height" multiplier="1:1" id="Kx7-vI-0aw"/>
+                                </constraints>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="10d" translatesAutoresizingMaskIntoConstraints="NO" id="XK6-2k-IL3">
+                                <rect key="frame" x="240.66666666666663" y="400" width="52" height="52"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="52" id="L58-Hc-ClJ"/>
+                                    <constraint firstAttribute="width" secondItem="XK6-2k-IL3" secondAttribute="height" multiplier="1:1" id="PJh-Bw-MEz"/>
+                                    <constraint firstAttribute="height" constant="52" id="SBr-3t-86x"/>
+                                </constraints>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="01d" translatesAutoresizingMaskIntoConstraints="NO" id="Hfx-Hx-8hi">
+                                <rect key="frame" x="100.66666666666667" y="400" width="52.000000000000014" height="52"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="Hfx-Hx-8hi" secondAttribute="height" multiplier="1:1" id="EqD-Li-aVA"/>
+                                    <constraint firstAttribute="width" constant="52" id="QHz-7x-qAd"/>
+                                    <constraint firstAttribute="height" constant="52" id="dTr-a2-4VX"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" red="0.41568627450980389" green="0.5725490196078431" blue="0.76862745098039209" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="XK6-2k-IL3" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" constant="70" id="1QU-Ox-D6V"/>
+                            <constraint firstItem="WTV-TQ-o3W" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="2MM-hz-ldV"/>
+                            <constraint firstItem="WTV-TQ-o3W" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="8Nn-lH-sN0"/>
+                            <constraint firstItem="Hfx-Hx-8hi" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="LxX-He-ich"/>
+                            <constraint firstItem="Hfx-Hx-8hi" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" constant="-70" id="MR5-m8-96I"/>
+                            <constraint firstItem="XK6-2k-IL3" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="lf8-ZH-QHy"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="53" y="375"/>
+            <point key="canvasLocation" x="52.671755725190835" y="374.64788732394368"/>
         </scene>
     </scenes>
+    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+    <resources>
+        <image name="01d" width="100" height="100"/>
+        <image name="04d" width="100" height="100"/>
+        <image name="10d" width="100" height="100"/>
+    </resources>
 </document>

@@ -10,10 +10,10 @@ import RxSwift
 import RxCocoa
 
 protocol CitySearchViewModelProtocol {
-  
+  func transform(input: CitySearchViewModel.Input) -> CitySearchViewModel.Output
 }
 
-final class CitySearchViewModel {
+final class CitySearchViewModel: CitySearchViewModelProtocol {
   private let cityListUseCase: CityListUseCaseProtocol
   private let disposeBag = DisposeBag()
   

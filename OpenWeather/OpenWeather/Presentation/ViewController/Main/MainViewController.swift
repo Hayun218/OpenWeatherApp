@@ -86,6 +86,12 @@ final class MainViewController: UIViewController {
       make.height.equalTo(44)
     }
     
+    
+    
+    loadingIndicator.snp.makeConstraints { make in
+      make.center.equalToSuperview()
+    }
+    
     scrollView.snp.makeConstraints { make in
       make.top.equalTo(searchButton.snp.bottom)
       make.leading.trailing.bottom.equalToSuperview()
@@ -119,26 +125,26 @@ final class MainViewController: UIViewController {
       make.height.equalTo(200)
     }
     
-    let metricWidth = (view.frame.width - 42) / 2  // 2개의 아이템을 위한 너비 계산
+    let metricWidth = (view.frame.width - 42) / 2
     
     humidityView.snp.makeConstraints { make in
       make.top.equalTo(mapView.snp.bottom).offset(20)
       make.leading.equalToSuperview().inset(16)
       make.width.equalTo(metricWidth)
-      make.height.equalTo(metricWidth-20)  // 높이를 너비와 동일하게 설정
+      make.height.equalTo(metricWidth-20)
     }
     
     cloudsView.snp.makeConstraints { make in
       make.top.equalTo(humidityView)
       make.leading.equalTo(humidityView.snp.trailing).offset(20)
       make.trailing.equalToSuperview().inset(16)
-      make.width.height.equalTo(humidityView)  // 너비와 높이를 humidityView와 동일하게
+      make.width.height.equalTo(humidityView)
     }
     
     windSpeedView.snp.makeConstraints { make in
       make.top.equalTo(humidityView.snp.bottom).offset(20)
       make.leading.equalToSuperview().inset(16)
-      make.width.height.equalTo(humidityView)  // 너비와 높이를 humidityView와 동일하게
+      make.width.height.equalTo(humidityView)
       make.bottom.equalToSuperview().offset(-20)
     }
   }
@@ -191,7 +197,7 @@ final class MainViewController: UIViewController {
             self?.backgroundImageView.backgroundColor = .clear
           } else {
             self?.backgroundImageView.image = nil
-            self?.backgroundImageView.backgroundColor = UIColor(red: 0.2, green: 0.4, blue: 0.8, alpha: 1.0)
+            self?.backgroundImageView.backgroundColor = UIColor(hexCode: "6A92C4")
           }
         }
       })
@@ -246,8 +252,8 @@ final class MainViewController: UIViewController {
       value: "\(weather.todayForecast.averageClouds)%"
     )
     windSpeedView.configure(
-      title: "바람",
-      value: String(format: "%.1f m/s", weather.todayForecast.averageWindSpeed)
+      title: "바람 속도",
+      value: String(format: "%.2f m/s", weather.todayForecast.averageWindSpeed)
     )
   }
   
